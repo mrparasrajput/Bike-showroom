@@ -1,0 +1,50 @@
+{% extends 'showroom/base.html' %}
+{% block title %}Service | BikeZone{% endblock %}
+{% block page_title %}Service Records{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'service_add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i> New Service</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <form method="get" class="d-flex gap-2 flex-wrap">
+            <div class="search-bar"><i class="bi bi-search" style="color:var(--text-muted)"></i>
+                <input type="text" name="q" value="{{ query }}" placeholder="Search customer, bike...">
+            </div>
+            <select name="status" class="form-select form-select-sm" style="width:auto">
+                <option value="">All Status</option>
+                {% for val, label in status_choices %}<option value="{{ val }}" {% if status == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <button type="submit" class="btn btn-dark btn-sm">Filter</button>
+        </form>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Customer</th><th>Bike</th><th>Service Type</th><th>Date</th><th>KM</th><th>Parts</th><th>Labor</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for svc in services %}
+            <tr>
+                <td><a href="{% url 'customer_detail' svc.customer.pk %}" style="color:rgb(0, 0, 0);font-weight:600;text-decoration:none">{{ svc.customer.full_name }}</a></td>
+                <td style="font-size:12px">{{ svc.bike_model }}</td>
+                <td>{{ svc.get_service_type_display }}</td>
+                <td style="font-size:12px;color:var(--text-muted)">{{ svc.service_date }}</td>
+                <td style="font-size:12px">{{ svc.km_reading|default:'-' }}</td>
+                <td>₹{{ svc.parts_cost|floatformat:0 }}</td>
+                <td>₹{{ svc.labor_cost|floatformat:0 }}</td>
+                <td style="color:var(black);font-weight:600">₹{{ svc.total_cost|floatformat:0 }}</td>
+                <td><span class="status-badge badge-{{ svc.status }}">{{ svc.get_status_display }}</span></td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'service_edit' svc.pk %}" class="btn btn-dark btn-sm"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'service_delete' svc.pk %}" class="btn btn-sm" style="background:rgba(255,77,77,.15);border-color:rgba(255,77,77,.3);color:#ff4d4d"><i class="bi bi-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="10" class="text-center py-5" style="color:var(--text-muted)">No service records found</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

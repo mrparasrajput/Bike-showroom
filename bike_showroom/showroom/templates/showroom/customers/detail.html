@@ -1,0 +1,82 @@
+{% extends 'showroom/base.html' %}
+{% block title %}{{ customer }} | BikeZone{% endblock %}
+{% block page_title %}Customer Profile{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'customer_edit' customer.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-pencil me-1"></i>Edit</a>
+<a href="{% url 'customer_list' %}" class="btn btn-dark btn-sm">Back</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div style="width:56px;height:56px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:'Rajdhani',sans-serif">
+                        {{ customer.first_name|first|upper }}
+                    </div>
+                    <div>
+                        <h4 style="font-family:'Rajdhani',sans-serif;margin:0" >{{ customer.full_name }}</h4>
+                        <div style="font-size:12px;color:var(--text-muted)">Customer since {{ customer.created_at|date:"M Y" }}</div>
+                    </div>
+                </div>
+                {% for label, value in details %}
+                <div class="mb-2 d-flex gap-2">
+                    <div style="color:var(--text-muted);font-size:12px;width:120px;flex-shrink:0">{{ label }}</div>
+                    <div style="font-size:13px">{{ value|default:'-' }}</div>
+                </div>
+                {% endfor %}
+                <div class="mb-2 d-flex gap-2"><div style="color:var(--text-muted);font-size:12px;width:120px;flex-shrink:0">Email</div><div style="font-size:13px">{{ customer.email }}</div></div>
+                <div class="mb-2 d-flex gap-2"><div style="color:var(--text-muted);font-size:12px;width:120px;flex-shrink:0">Phone</div><div style="font-size:13px">{{ customer.phone }}</div></div>
+                <div class="mb-2 d-flex gap-2"><div style="color:var(--text-muted);font-size:12px;width:120px;flex-shrink:0">City</div><div style="font-size:13px">{{ customer.city|default:'-' }}</div></div>
+                <div class="mb-2 d-flex gap-2"><div style="color:var(--text-muted);font-size:12px;width:120px;flex-shrink:0">State</div><div style="font-size:13px">{{ customer.state|default:'-' }}</div></div>
+                <div class="mb-2 d-flex gap-2"><div style="color:var(--text-muted);font-size:12px;width:120px;flex-shrink:0">Aadhar</div><div style="font-size:13px">{{ customer.aadhar_number|default:'-' }}</div></div>
+                <div class="mb-2 d-flex gap-2"><div style="color:var(--text-muted);font-size:12px;width:120px;flex-shrink:0">DL</div><div style="font-size:13px">{{ customer.driving_license|default:'-' }}</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="card-title">Purchase History</h5></div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>Invoice</th><th>Bike</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td><a href="{% url 'sale_detail' sale.pk %}" style="color:var(--primary)">{{ sale.invoice_number }}</a></td>
+                        <td>{{ sale.bike.brand.name }} {{ sale.bike.model_name }}</td>
+                        <td>{{ sale.sale_date }}</td>
+                        <td style="color:var(--dark-2)">₹{{ sale.final_amount|floatformat:0 }}</td>
+                        <td><span class="status-badge badge-{{ sale.status }}">{{ sale.get_status_display }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-3" style="color:var(--text-muted)">No purchases</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Service History</h5></div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>Date</th><th>Bike</th><th>Type</th><th>Status</th><th>Cost</th></tr></thead>
+                    <tbody>
+                    {% for svc in services %}
+                    <tr>
+                        <td>{{ svc.service_date }}</td>
+                        <td>{{ svc.bike_model }}</td>
+                        <td>{{ svc.get_service_type_display }}</td>
+                        <td><span class="status-badge badge-{{ svc.status }}">{{ svc.get_status_display }}</span></td>
+                        <td>₹{{ svc.total_cost|floatformat:0 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-3" style="color:var(--text-muted)">No service records</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

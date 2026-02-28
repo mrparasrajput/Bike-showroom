@@ -1,0 +1,80 @@
+{% extends 'showroom/base.html' %}
+{% block title %}Bikes | BikeZone{% endblock %}
+{% block page_title %}Bike Inventory{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'bike_add' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i> Add Bike
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <form method="get" class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="search-bar" style="min-width:200px">
+                <i class="bi bi-search" style="color:var(--text-muted)"></i>
+                <input type="text" name="q" value="{{ query }}" placeholder="Search bikes...">
+            </div>
+            <select name="status" class="form-select form-select-sm" style="width:auto">
+                <option value="">All Status</option>
+                {% for val, label in status_choices %}
+                <option value="{{ val }}" {% if status == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <select name="type" class="form-select form-select-sm" style="width:auto">
+                <option value="">All Types</option>
+                {% for val, label in type_choices %}
+                <option value="{{ val }}" {% if bike_type == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-dark btn-sm">Filter</button>
+            <a href="{% url 'bike_list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+        </form>
+        <span style="color:var(--text-muted);font-size:13px">{{ bikes.count }} bikes</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr>
+                <th>Image</th><th>Brand</th><th>Model</th><th>Year</th><th>Type</th>
+                <th>Engine</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody>
+            {% for bike in bikes %}
+            <tr>
+                <td>
+                    {% if bike.image %}
+                    <img src="{{ bike.image.url }}" class="bike-img-thumb" alt="">
+                    {% else %}
+                    <div class="bike-img-placeholder"><i class="bi bi-bicycle"></i></div>
+                    {% endif %}
+                </td>
+                <td><strong>{{ bike.brand.name }}</strong></td>
+                <td>
+                    <a href="{% url 'bike_detail' bike.pk %}" style="color:white;text-decoration:none">
+                        {{ bike.model_name }}
+                    </a>
+                </td>
+                <td>{{ bike.year }}</td>
+                <td>{{ bike.get_bike_type_display }}</td>
+                <td>{{ bike.engine_cc }} cc</td>
+                <td style="color:var(--success)">₹{{ bike.price|floatformat:0 }}</td>
+                <td>{{ bike.stock_quantity }}</td>
+                <td><span class="status-badge badge-{{ bike.status }}">{{ bike.get_status_display }}</span></td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'bike_edit' bike.pk %}" class="btn btn-dark btn-sm"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'bike_delete' bike.pk %}" class="btn btn-danger btn-sm" style="background:rgba(255,77,77,.15);border-color:rgba(255,77,77,.3);color:#ff4d4d"><i class="bi bi-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="10" class="text-center py-5" style="color:var(--text-muted)">
+                No bikes found. <a href="{% url 'bike_add' %}" style="color:var(--primary)">Add your first bike</a>
+            </td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

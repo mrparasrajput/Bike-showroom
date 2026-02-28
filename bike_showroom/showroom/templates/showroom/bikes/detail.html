@@ -1,0 +1,106 @@
+{% extends 'showroom/base.html' %}
+{% block title %}{{ bike }} | BikeZone{% endblock %}
+{% block page_title %}Bike Detail{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'bike_edit' bike.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-pencil me-1"></i>Edit</a>
+<a href="{% url 'bike_list' %}" class="btn btn-dark btn-sm">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if bike.image %}
+                <img src="{{ bike.image.url }}" style="width:100%;border-radius:10px;margin-bottom:16px" alt="">
+                {% else %}
+                <div style="background:var(--dark-3);border-radius:10px;padding:40px;font-size:60px;margin-bottom:16px">🏍️</div>
+                {% endif %}
+                <h3 style="font-family:'Rajdhani',sans-serif;font-size:24px">{{ bike.brand.name }} {{ bike.model_name }}</h3>
+                <div style="font-size:28px;color:var(--success);font-family:'Rajdhani',sans-serif;font-weight:700">₹{{ bike.price|floatformat:0 }}</div>
+                <span class="status-badge badge-{{ bike.status }} mt-2 d-inline-block">{{ bike.get_status_display }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="card-title">Specifications</h5></div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for label, value in specs %}
+                    <div class="col-6 col-md-4">
+                        <div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:1px">{{ label }}</div>
+                        <div style="font-weight:600;margin-top:2px">{{ value }}</div>
+                    </div>
+                    {% endfor %}
+                    <div class="col-6 col-md-4">
+                        <div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:1px">Brand</div>
+                        <div style="font-weight:600;margin-top:2px">{{ bike.brand.name }}</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:1px">Year</div>
+                        <div style="font-weight:600;margin-top:2px">{{ bike.year }}</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:1px">Type</div>
+                        <div style="font-weight:600;margin-top:2px">{{ bike.get_bike_type_display }}</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:1px">Engine</div>
+                        <div style="font-weight:600;margin-top:2px">{{ bike.engine_cc }} CC</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:1px">Color</div>
+                        <div style="font-weight:600;margin-top:2px">{{ bike.color }}</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:1px">Mileage</div>
+                        <div style="font-weight:600;margin-top:2px">{{ bike.mileage|default:'N/A' }} kmpl</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:1px">Stock</div>
+                        <div style="font-weight:600;margin-top:2px">{{ bike.stock_quantity }} units</div>
+                    </div>
+                    {% if bike.vin_number %}
+                    <div class="col-6 col-md-4">
+                        <div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:1px">VIN</div>
+                        <div style="font-weight:600;margin-top:2px">{{ bike.vin_number }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if bike.description %}
+                <hr style="border-color:var(--border)">
+                <p style="color:var(--text-muted);font-size:13px">{{ bike.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Sales History</h5>
+                <a href="{% url 'sale_add' %}" class="btn btn-primary btn-sm">Record Sale</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>Invoice</th><th>Customer</th><th>Date</th><th>Amount</th><th>Payment</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td><a href="{% url 'sale_detail' sale.pk %}" style="color:var(--primary)">{{ sale.invoice_number }}</a></td>
+                        <td>{{ sale.customer.full_name }}</td>
+                        <td>{{ sale.sale_date }}</td>
+                        <td>₹{{ sale.final_amount|floatformat:0 }}</td>
+                        <td>{{ sale.get_payment_method_display }}</td>
+                        <td><span class="status-badge badge-{{ sale.status }}">{{ sale.get_status_display }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center py-3" style="color:var(--text-muted)">No sales recorded</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

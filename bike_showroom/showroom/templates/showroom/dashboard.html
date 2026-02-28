@@ -1,0 +1,203 @@
+{% extends 'showroom/base.html' %}
+{% block title %}Dashboard | BikeZone{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'sale_add' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i> New Sale
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card orange">
+            <div class="stat-icon orange"><i class="bi bi-bicycle"></i></div>
+            <div class="stat-value">{{ total_bikes }}</div>
+            <div class="stat-label">Total Bikes in Stock</div>
+            <div class="mt-2" style="font-size:11px;color:var(--success)">{{ available_bikes }} Available</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card green">
+            <div class="stat-icon green"><i class="bi bi-people"></i></div>
+            <div class="stat-value">{{ total_customers }}</div>
+            <div class="stat-label">Total Customers</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="bi bi-receipt"></i></div>
+            <div class="stat-value">{{ total_sales }}</div>
+            <div class="stat-label">Total Sales Completed</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card yellow">
+            <div class="stat-icon yellow"><i class="bi bi-currency-rupee"></i></div>
+            <div class="stat-value">₹{{ monthly_revenue|floatformat:0 }}</div>
+            <div class="stat-label">This Month Revenue</div>
+        </div>
+    </div>
+</div>
+
+<!-- Second row of stats -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card orange">
+            <div class="stat-icon orange"><i class="bi bi-tools"></i></div>
+            <div class="stat-value">{{ pending_services }}</div>
+            <div class="stat-label">Pending Services</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="bi bi-chat-square-text"></i></div>
+            <div class="stat-value">{{ new_inquiries }}</div>
+            <div class="stat-label">New Inquiries</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card green">
+            <div class="stat-icon green"><i class="bi bi-graph-up-arrow"></i></div>
+            <div class="stat-value">₹{{ total_revenue|floatformat:0 }}</div>
+            <div class="stat-label">Total All-Time Revenue</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card yellow">
+            <div class="stat-icon yellow"><i class="bi bi-box-seam"></i></div>
+            <div class="stat-value">{{ available_bikes }}</div>
+            <div class="stat-label">Bikes Available</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <!-- Sales Chart -->
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Monthly Sales (Last 6 Months)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="salesChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Inquiries -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Recent Inquiries</h5>
+                <a href="{% url 'inquiry_list' %}" class="btn btn-dark btn-sm">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% for inquiry in recent_inquiries %}
+                <div class="d-flex align-items-center px-4 py-3" style="border-bottom:1px solid var(--border)">
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold" style="font-size:13px">{{ inquiry.name }}</div>
+                        <div style="font-size:11px;color:var(--text-muted)">{{ inquiry.phone }}</div>
+                    </div>
+                    <span class="status-badge badge-{{ inquiry.status }}">{{ inquiry.get_status_display }}</span>
+                </div>
+                {% empty %}
+                <div class="text-center py-4" style="color:var(--text-muted)">No inquiries yet</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Sales & Services -->
+<div class="row g-3">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Recent Sales</h5>
+                <a href="{% url 'sale_list' %}" class="btn btn-dark btn-sm">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr>
+                        <th>Invoice</th><th>Bike</th><th>Customer</th><th>Amount</th><th>Status</th>
+                    </tr></thead>
+                    <tbody>
+                    {% for sale in recent_sales %}
+                    <tr>
+                        <td><a href="{% url 'sale_detail' sale.pk %}" style="color:var(--primary)">{{ sale.invoice_number }}</a></td>
+                        <td style="font-size:12px">{{ sale.bike.brand.name }} {{ sale.bike.model_name }}</td>
+                        <td>{{ sale.customer.full_name }}</td>
+                        <td>₹{{ sale.final_amount|floatformat:0 }}</td>
+                        <td><span class="status-badge badge-{{ sale.status }}">{{ sale.get_status_display }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-4" style="color:var(--text-muted)">No sales yet</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Recent Services</h5>
+                <a href="{% url 'service_list' %}" class="btn btn-dark btn-sm">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr>
+                        <th>Customer</th><th>Bike</th><th>Type</th><th>Status</th><th>Cost</th>
+                    </tr></thead>
+                    <tbody>
+                    {% for svc in recent_services %}
+                    <tr>
+                        <td>{{ svc.customer.full_name }}</td>
+                        <td style="font-size:12px">{{ svc.bike_model }}</td>
+                        <td>{{ svc.get_service_type_display }}</td>
+                        <td><span class="status-badge badge-{{ svc.status }}">{{ svc.get_status_display }}</span></td>
+                        <td>₹{{ svc.total_cost|floatformat:0 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-4" style="color:var(--text-muted)">No services yet</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const monthlyData = {{ monthly_data|safe }};
+const ctx = document.getElementById('salesChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: monthlyData.map(d => d.month),
+        datasets: [{
+            label: 'Sales Count',
+            data: monthlyData.map(d => d.count),
+            backgroundColor: 'rgba(255,77,0,0.7)',
+            borderColor: '#ff4d00',
+            borderWidth: 1,
+            borderRadius: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: '#333' }, ticks: { color: '#888' } },
+            y: { grid: { color: '#333' }, ticks: { color: '#888', stepSize: 1 }, beginAtZero: true }
+        }
+    }
+});
+</script>
+{% endblock %}

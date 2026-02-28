@@ -1,0 +1,35 @@
+{% extends 'showroom/base.html' %}
+{% block title %}{{ title }} | BikeZone{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-lg-9">
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">{{ title }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3">
+            {% for field in form %}
+            <div class="col-md-{% if field.field.widget.attrs.rows %}12{% else %}6{% endif %}">
+                <label class="form-label">{{ field.label }}{% if field.field.required %} <span style="color:var(--primary)">*</span>{% endif %}</label>
+                {{ field }}
+                {% if field.errors %}<div style="color:var(--danger);font-size:12px;margin-top:4px">{{ field.errors.0 }}</div>{% endif %}
+                {% if field.help_text %}<div style="color:var(--text-muted);font-size:11px;margin-top:4px">{{ field.help_text }}</div>{% endif %}
+            </div>
+            {% endfor %}
+            </div>
+            <hr style="border-color:var(--border);margin:24px 0">
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> Save</button>
+                <a href="javascript:history.back()" class="btn btn-dark">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}

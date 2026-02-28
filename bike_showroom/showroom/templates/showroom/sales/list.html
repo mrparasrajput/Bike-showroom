@@ -1,0 +1,51 @@
+{% extends 'showroom/base.html' %}
+{% block title %}Sales | BikeZone{% endblock %}
+{% block page_title %}Sales{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'sale_add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i> New Sale</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <form method="get" class="d-flex gap-2 flex-wrap">
+            <div class="search-bar"><i class="bi bi-search" style="color:var(--text-muted)"></i>
+                <input type="text" name="q" value="{{ query }}" placeholder="Search invoice, customer...">
+            </div>
+            <select name="status" class="form-select form-select-sm" style="width:auto">
+                <option value="">All Status</option>
+                {% for val, label in status_choices %}<option value="{{ val }}" {% if status == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <button type="submit" class="btn btn-dark btn-sm">Filter</button>
+        </form>
+        <span style="color:var(--success);font-size:13px;font-weight:600">Total: ₹{{ total_revenue|floatformat:0 }}</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Invoice</th><th>Bike</th><th>Customer</th><th>Date</th><th>Selling Price</th><th>Discount</th><th>Final</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for sale in sales %}
+            <tr>
+                <td><a href="{% url 'sale_detail' sale.pk %}" style="color:var(--primary)">{{ sale.invoice_number }}</a></td>
+                <td style="font-size:12px">{{ sale.bike.brand.name }} {{ sale.bike.model_name }}</td>
+                <td>{{ sale.customer.full_name }}</td>
+                <td style="font-size:12px;color:var(--text-muted)">{{ sale.sale_date }}</td>
+                <td>₹{{ sale.selling_price|floatformat:0 }}</td>
+                <td style="color:var(black)">{% if sale.discount %}-₹{{ sale.discount|floatformat:0 }}{% else %}-{% endif %}</td>
+                <td style="color:var(red);font-weight:600">₹{{ sale.final_amount|floatformat:0 }}</td>
+                <td>{{ sale.get_payment_method_display }}</td>
+                <td><span class="status-badge badge-{{ sale.status }}">{{ sale.get_status_display }}</span></td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'sale_edit' sale.pk %}" class="btn btn-dark btn-sm"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'sale_delete' sale.pk %}" class="btn btn-sm" style="background:rgba(255,77,77,.15);border-color:rgba(255,77,77,.3);color:#ff4d4d"><i class="bi bi-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="10" class="text-center py-5" style="color:var(--text-muted)">No sales found</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

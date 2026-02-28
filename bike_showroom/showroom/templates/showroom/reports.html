@@ -1,0 +1,117 @@
+{% extends 'showroom/base.html' %}
+{% block title %}Reports | BikeZone{% endblock %}
+{% block page_title %}Reports & Analytics{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card green">
+            <div class="stat-icon green"><i class="bi bi-currency-rupee"></i></div>
+            <div class="stat-value">₹{{ total_revenue|floatformat:0 }}</div>
+            <div class="stat-label">Total Sales Revenue</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card orange">
+            <div class="stat-icon orange"><i class="bi bi-calendar-month"></i></div>
+            <div class="stat-value">₹{{ monthly_revenue|floatformat:0 }}</div>
+            <div class="stat-label">This Month Revenue</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="bi bi-receipt"></i></div>
+            <div class="stat-value">{{ total_sales_count }}</div>
+            <div class="stat-label">Total Completed Sales</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card yellow">
+            <div class="stat-icon yellow"><i class="bi bi-tools"></i></div>
+            <div class="stat-value">₹{{ service_parts_revenue|add:service_labor_revenue|floatformat:0 }}</div>
+            <div class="stat-label">Service Revenue</div>
+        </div>
+    </div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Top Selling Bikes</h5></div>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead><tr><th>#</th><th>Brand</th><th>Model</th><th>Units Sold</th></tr></thead>
+                    <tbody>
+                    {% for b in top_bikes %}
+                    <tr>
+                        <td style="color:var(--primary);font-weight:700">{{ forloop.counter }}</td>
+                        <td>{{ b.bike__brand__name }}</td>
+                        <td>{{ b.bike__model_name }}</td>
+                        <td style="color:var(--success);font-weight:600">{{ b.count }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center py-3" style="color:var(--text-muted)">No sales data</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Payment Methods</h5></div>
+            <div class="card-body">
+                {% for stat in payment_stats %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="font-size:13px">{{ stat.payment_method|capfirst }}</span>
+                        <span style="font-size:13px;font-weight:600;color:var(--success)">{{ stat.count }} sales</span>
+                    </div>
+                    <div style="background:var(--dark-3);height:8px;border-radius:4px;overflow:hidden">
+                        <div style="background:var(--primary);height:100%;border-radius:4px;width:{{ stat.count }}0%;max-width:100%"></div>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color:var(--text-muted);text-align:center">No data yet</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Service Revenue</h5></div>
+            <div class="card-body d-flex gap-4">
+                <div>
+                    <div style="color:var(--text-muted);font-size:12px;margin-bottom:4px">Parts</div>
+                    <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--info)">₹{{ service_parts_revenue|floatformat:0 }}</div>
+                </div>
+                <div>
+                    <div style="color:var(--text-muted);font-size:12px;margin-bottom:4px">Labor</div>
+                    <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--warning)">₹{{ service_labor_revenue|floatformat:0 }}</div>
+                </div>
+                <div>
+                    <div style="color:var(--text-muted);font-size:12px;margin-bottom:4px">Total</div>
+                    <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--success)">₹{{ service_parts_revenue|add:service_labor_revenue|floatformat:0 }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Customer Stats</h5></div>
+            <div class="card-body d-flex gap-4">
+                <div>
+                    <div style="color:var(--text-muted);font-size:12px;margin-bottom:4px">Total</div>
+                    <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--primary)">{{ total_customers }}</div>
+                </div>
+                <div>
+                    <div style="color:var(--text-muted);font-size:12px;margin-bottom:4px">New This Month</div>
+                    <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--success)">{{ new_customers_month }}</div>
+                </div>
+                <div>
+                    <div style="color:var(--text-muted);font-size:12px;margin-bottom:4px">Monthly Sales</div>
+                    <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--info)">{{ monthly_sales_count }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

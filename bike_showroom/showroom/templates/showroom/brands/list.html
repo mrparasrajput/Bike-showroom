@@ -1,0 +1,34 @@
+{% extends 'showroom/base.html' %}
+{% block title %}Brands | BikeZone{% endblock %}
+{% block page_title %}Brands{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'brand_add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i> Add Brand</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3">
+{% for brand in brands %}
+<div class="col-sm-6 col-lg-4">
+    <div class="card">
+        <div class="card-body d-flex align-items-center gap-3">
+            {% if brand.logo %}
+            <img src="{{ brand.logo.url }}" style="width:50px;height:50px;object-fit:contain;border-radius:8px">
+            {% else %}
+            <div style="width:50px;height:50px;background:var(--dark-3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px">🏍️</div>
+            {% endif %}
+            <div class="flex-grow-1">
+                <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700">{{ brand.name }}</div>
+                <div style="font-size:12px;color:var(--text-muted)">{{ brand.country }}</div>
+                <div style="font-size:12px;color:var(--primary)">{{ brand.bike_count }} bikes</div>
+            </div>
+            <div class="d-flex gap-1">
+                <a href="{% url 'brand_edit' brand.pk %}" class="btn btn-dark btn-sm"><i class="bi bi-pencil"></i></a>
+                <a href="{% url 'brand_delete' brand.pk %}" class="btn btn-sm" style="background:rgba(255,77,77,.15);border-color:rgba(255,77,77,.3);color:#ff4d4d"><i class="bi bi-trash"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="col-12 text-center py-5" style="color:var(--text-muted)">No brands yet. <a href="{% url 'brand_add' %}" style="color:var(--primary)">Add one</a></div>
+{% endfor %}
+</div>
+{% endblock %}
